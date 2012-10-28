@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<body>
+  <canvas id='world' width="600" height="400"/>
+  <script src="gameOfLife.js"></script>
+  <script src="res/microevent.js"></script>
+  <script>
+  
+  var GameCanvas = function(canvas, game) {
+    var 
+      self = this,
+      ctx = canvas.getContext('2d'),
+      cellWidth = canvas.width / game.width,
+      cellHeight = canvas.height / game.height;
+      
+    
+    this.draw = function() {
+      var i,j;    
+      
+      ctx.fillStyle = '#F3FFE0'
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (i = 0; i < game.width; i++) {
+        for (j = 0; j < game.height; j++) {
+          if (game.get(i,j)) {
+          
+            // TODO: Make the cell color depend on the number of neighbours
+          
+            ctx.strokeStyle = '#98C67B'; 
+            ctx.lineWidth = 1;
+            ctx.strokeRect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
+            ctx.fillStyle = '#4CC900';
+            ctx.fillRect(i * cellWidth + 1, j * cellHeight + 1, cellWidth - 2, cellHeight - 2);
+          }
+        }
+      }
+    }
+    
+    canvas.addEventListener("click", function(e) {
+      var x, y;
+      if (e.pageX || e.pageY) { 
+        x = e.pageX;
+        y = e.pageY;
+      }
+      else { 
+        x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+        y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+      } 
+      x -= canvas.offsetLeft;
+      y -= canvas.offsetTop;    
+      
+      // MicroEvent magic
+      self.trigger('click', { x: Math.floor(x/cellWidth), y: Math.floor(y/cellHeight) });
+    });
+  }
+  
+  MicroEvent.mixin(GameCanvas);
+
+
+  function spanCells(e) {
+    var x, y;
+    if (e.pageX || e.pageY) { 
+      x = e.pageX;
+      y = e.pageY;
+    }
+    else { 
+      x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+      y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+    } 
+    x -= gCanvasElement.offsetLeft;
+    y -= gCanvasElement.offsetTop;
+  }
+
+  var board = new Board(75,50);
+  var game = new Game(board);
+  var canvas = document.getElementById('world');
+  var gameCanvas = new GameCanvas(canvas, game);
+  
+  gameCanvas.bind('click', function(e) {
+    var i, j, radius = Math.round((board.width + board.height) / 2 * 0.05);
+    for (i = -radius; i < radius; i++) {
+      for (j = -radius; j < radius; j++) {
+        game.set(e.x + i, e.y + j, Math.floor(Math.random() * 2));
+      }
+    }
+    gameCanvas.draw();
+  });
+  
+  setInterval(function() {
+    gameCanvas.draw();
+    game.step();
+  }, 200);
+
+  </script>
+</body>
