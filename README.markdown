@@ -1,1 +1,1 @@
-Sample implementation of [Conway's Game Of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) using Javascript and HTML5 Canvas.
+Simple implementation of [Conway's Game Of Life](http://en.wikipedia.org/wiki/Conway's_Game_of_Life) using Javascript and HTML5 Canvas.
